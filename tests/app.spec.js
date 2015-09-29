@@ -7,28 +7,28 @@ var chai = require('chai'),
 
 
 describe('Tokens tests', function() {
-	describe('', function() {
+	describe('When creating tokens', function() {
 		it('', function(done) {
 		});
 		it('', function(done) {
 		});
 	})
 
-	describe('', function() {
+	describe('When deleting tokens', function() {
 		it('', function(done) {
 		});
 		it('', function(done) {
 		});
 	})
 
-	describe('', function() {
+	describe('When reading tokens', function() {
 		it('', function(done) {
 		});
 		it('', function(done) {
 		});
 	})
 
-	describe('', function() {
+	describe('When accessing the api endpoints', function() {
 		it('', function(done) {
 		});
 		it('', function(done) {
