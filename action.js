@@ -7,7 +7,8 @@ var Action = function(app) {
 };
 
 Action.prototype.create_new_token = function(stuff) {
-    return {token:"gibberish"};
+    return {token:"gibberish",
+            stuff:stuff  };
 };
 
 

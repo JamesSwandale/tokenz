@@ -4,12 +4,13 @@ var chai = require('chai'),
 	should = require('should'),
 	request = require('supertest'),
     sinon = require('sinon'),
-	app = require('../app');
+	app = require('../app'),
+    Action = require('../action');
 
 
 describe('Tokenz tests', function() {
     describe('API tests', function() {
-        describe.only('When creating tokens POST', function() {
+        describe('When creating tokens POST', function() {
 
             beforeEach(function(){
             })
@@ -55,21 +56,21 @@ describe('Tokenz tests', function() {
 
         })
 
-        describe('When deleting tokens', function() {
+        xdescribe('When deleting tokens', function() {
             it('', function(done) {
             });
             it('', function(done) {
             });
         })
 
-        describe('When reading tokens', function() {
+        xdescribe('When reading tokens', function() {
             it('', function(done) {
             });
             it('', function(done) {
             });
         })
 
-        describe('When accessing the api endpoints', function() {
+        xdescribe('When accessing the api endpoints', function() {
             it('', function(done) {
             });
             it('', function(done) {
@@ -83,10 +84,22 @@ describe('Tokenz tests', function() {
 
 
     describe('Action tests', function() {
-        describe('', function() {
-            it('', function(done) {
+        describe('Create new token', function() {
+            it('generates a database entry', function() {
+                var action = new Action(app);
+                var storethis = {
+                    "content": "cosa importante",
+                    "maxAge": 0,
+                    "type": "bicycle"
+                };
+
+                var ret = action.create_new_token(storethis);
+
+                ret.should.have.property('stuff', storethis);
+                ret.should.have.property('token', 'gibberish');
+
             });
-            it('', function(done) {
+            xit('', function(done) {
             });
         })
     })
