@@ -20,6 +20,7 @@ app.action = new Action(app);
 //}
 
 app.post("/v1/tokens", function(req, res) {
+	console.log("Request: " + req.body);
     var response = app.action.create_new_token("somestuff");
     res.type("json");
     res.status(201).send(response);
