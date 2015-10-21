@@ -1,14 +1,21 @@
 "use strict";
 var chai = require('chai'),
-	assert = chai.assert,
-	should = require('should'),
-	request = require('supertest'),
+    assert = chai.assert,
+    should = require('should'),
+    request = require('supertest'),
     sinon = require('sinon'),
-	app = require('../app'),
-    Action = require('../action');
+    app = require('../app'),
+    Action = require('../action'),
+    DataSchema = require('../dataschema');
 
 
 describe('Tokenz tests', function() {
+    after(function() {
+       // var action = new Action(app);
+       // var collName = action.getSchema().collection.name;
+       // action.getSchema().base.connections[0].db.dropCollection(collName);
+
+    });
     describe('API tests', function() {
         describe('When creating tokens POST', function() {
 
@@ -46,7 +53,7 @@ describe('Tokenz tests', function() {
                     .post("/v1/tokens")
                     .end(function(err, res) {
                         res.statusCode.should.equal(201);
-                        res.body.should.have.property("token",'nonsense');
+                        res.body.should.have.property("token");
                         app.action.create_new_token = real_create_new_token;
                         done();
                     });
@@ -56,26 +63,44 @@ describe('Tokenz tests', function() {
 
         })
 
-        xdescribe('When deleting tokens', function() {
-            it('', function(done) {
+        describe('When reading tokens', function() {
+            it('Returns the value returned by the action layer', function(done) {
+                var real_get_data = app.action.get_data;
+                app.action.get_data = function(token) {
+                    if(token === 'test-token') {
+                        return {stored:'nonsense'};
+                    }
+                };
+
+                request(app)
+                    .get("/v1/tokens/test-token")
+                    .end(function(err, res) {
+                        res.statusCode.should.equal(200);
+                        res.body.should.have.property("stored","nonsense");
+                        app.action.get_data = real_get_data;
+                        done();
+                    });
             });
-            it('', function(done) {
-            });
+            //it('', function(done) {
+            //});
         })
 
-        xdescribe('When reading tokens', function() {
-            it('', function(done) {
-            });
-            it('', function(done) {
-            });
-        })
+        /*
+                describe.skip('When deleting tokens', function() {
+                    it('', function(done) {
+                    });
+                    it('', function(done) {
+                    });
+                })
 
-        xdescribe('When accessing the api endpoints', function() {
-            it('', function(done) {
-            });
-            it('', function(done) {
-            });
-        })
+
+                describe.skip('When accessing the api endpoints', function() {
+                    it('', function(done) {
+                    });
+                    it('', function(done) {
+                    });
+                })
+                */
     })
 
 
@@ -96,11 +121,37 @@ describe('Tokenz tests', function() {
                 var ret = action.create_new_token(storethis);
 
                 ret.should.have.property('stuff', storethis);
-                ret.should.have.property('token', 'gibberish');
+                ret.should.have.property('token');
 
             });
-            xit('', function(done) {
-            });
+
+        })
+
+        describe('get_data', function(){
+            it('queries the database correctly', function(){
+                var action = new Action(app);
+                var mongoSpy = sinon.spy(action.getSchema() ,'find' );
+
+                action.get_data('super-long-token');
+
+
+                mongoSpy.called.should.equal(true);
+                mongoSpy.calledWith({token:'super-long-token'}).should.equal(true);
+            })
+
+            it.skip('calls back with the first token found', function(){
+                //var action = new Action(app);
+                //var real_schema_find = action.getSchema().find;
+                //action.getSchema().find = function(criteria, )
+                //var mongoSpy = sinon.stub()  ( ,'find' );
+                //
+                //action.get_data('super-long-token', function(foundtoken) {
+                //
+                //});
+                //
+
+            })
+
         })
     })
 })
