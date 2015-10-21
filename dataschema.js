@@ -24,7 +24,7 @@ var DataSchema = new Schema({
         required:true
     },
     content:{
-        type:String,
+        type:Object,
         trim: true,
         unique:false,
         required:true
