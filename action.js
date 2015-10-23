@@ -11,13 +11,16 @@
 var Data = require('./dataschema');
 
 // Token
-var rand = function() {
-    return Math.random().toString(36).substr(2); // remove `0.`
-};
-
 var token = function() {
-    return rand() + rand(); // to make it longer
-};
+    var finalToken = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/x/g, function()
+        {
+            return (Math.random()*16|0).toString(16)
+        }).replace(/y/, function(){
+            var hex = ['8', '9', 'a', 'b'];
+            return hex[(Math.random() * (hex.length - 0) + 0|0)]
+        })
+    return finalToken
+    };
 
 
 
