@@ -20,7 +20,9 @@ describe('Tokenz tests', function() {
         describe('When creating tokens POST', function() {
 
             beforeEach(function(){
-            })
+
+            });
+
             it('will call the action class', function(done) {
                 var spy = sinon.spy(app.action, 'create_new_token');
 
@@ -128,27 +130,42 @@ describe('Tokenz tests', function() {
         })
 
         describe('get_data', function(){
-            it('queries the database correctly', function(){
-                var action = new Action(app);
-                var mongoSpy = sinon.spy(action.getSchema() ,'find' );
+            var action,storethis,ret;
 
-                action.get_data('super-long-token');
+            before(function() {
+                action = new Action(app);
+                storethis = {
+                    "content": "cosa importante",
+                    "maxAge": 0,
+                    "type": "bicycle"
+                };
 
+                ret = action.create_new_token(storethis);
 
-                mongoSpy.called.should.equal(true);
-                mongoSpy.calledWith({token:'super-long-token'}).should.equal(true);
+            });
+            it('queries the database correctly', function(done){
+                var mongoSpy = sinon.spy(action.getSchema() ,'findOne' );
+
+                action.get_data(ret.token, function() {
+                    mongoSpy.called.should.equal(true);
+                    mongoSpy.calledWith({token:ret.token}).should.equal(true);
+
+                    mongoSpy.restore();
+
+                    done();
+                });
+
             })
 
-            it.skip('calls back with the first token found', function(){
-                //var action = new Action(app);
-                //var real_schema_find = action.getSchema().find;
-                //action.getSchema().find = function(criteria, )
-                //var mongoSpy = sinon.stub()  ( ,'find' );
-                //
-                //action.get_data('super-long-token', function(foundtoken) {
-                //
-                //});
-                //
+            it('calls back with the first token found', function(done){
+                   //
+
+
+                action.get_data(ret.token, function(foundtoken) {
+                    foundtoken.should.deepEqual(storethis);
+                    done();
+                });
+
 
             })
 

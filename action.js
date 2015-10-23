@@ -58,8 +58,17 @@ Action.prototype.create_new_token = function(stuff) {
             stuff:stuff  };
 };
 
-Action.prototype.get_data = function(token) {
-    Data.find({token:token})
+Action.prototype.get_data = function(token, callback) {
+    Data.findOne({token:token})
+        .exec( function(err, data) {
+            if (err) {
+                //console.log(err);
+                //res.send(500);
+            } else {
+                callback(data.toObject().content);
+            }
+        });
+
 };
 
 module.exports = Action;
