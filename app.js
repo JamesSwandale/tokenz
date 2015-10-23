@@ -29,9 +29,10 @@ app.post("/v1/tokens", function(req, res) {
 
 app.get("/v1/tokens/:token", function(req, res) {
     console.log("Request: " + req.body);
-    var response = app.action.get_data(req.params.token);
-    res.type("json");
-    res.status(200).send(response);
+    var response = app.action.get_data(req.params.token, function(data) {
+        res.type("json");
+        res.status(200).send(data);
+    });
 });
 
 // Export the app for testing

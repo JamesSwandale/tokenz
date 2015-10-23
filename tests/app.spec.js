@@ -68,9 +68,9 @@ describe('Tokenz tests', function() {
         describe('When reading tokens', function() {
             it('Returns the value returned by the action layer', function(done) {
                 var real_get_data = app.action.get_data;
-                app.action.get_data = function(token) {
+                app.action.get_data = function(token, callback) {
                     if(token === 'test-token') {
-                        return {stored:'nonsense'};
+                       callback({stored:'nonsense'});
                     }
                 };
 
