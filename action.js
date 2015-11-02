@@ -1,13 +1,3 @@
-/**
- * Created by jonathanc on 10/9/15.
- */
-
-/**
- * Document approval Schema
- */
-
-
-
 var Data = require('./dataschema');
 
 // Token
@@ -44,10 +34,10 @@ Action.prototype.create_new_token = function(stuff) {
 
     console.log("New data with token: " + newData.token);
 
-    newData.save(function(err){
+    newData.save(function(err, res){
         if (err) {
             console.log(err);
-            res.sendStatus(500);
+//            res.sendStatus(500);
         } else {
             //exports.sendPushNotification(newData,'Create', req);
             //res.status(201).json(newApproval);
@@ -59,16 +49,32 @@ Action.prototype.create_new_token = function(stuff) {
 };
 
 Action.prototype.get_data = function(token, callback) {
-    Data.findOne({token:token})
+    Data.findOne({"token":token})
         .exec( function(err, data) {
             if (err) {
-                //console.log(err);
+                console.log(err);
                 //res.send(500);
             } else {
                 callback(data.toObject().content);
             }
         });
-
 };
+
+Action.prototype.delete_data = function(token) {
+	var deletedMessage = "Data deleted!"
+	Data.findOneAndRemove({token:token})
+        .exec( function(err, data) {
+            if (err) {
+                console.log(err);
+                //res.send(500);
+            } else {
+    		Data.findOne({"token":token})
+            }
+        });
+
+    console.log(deletedMessage)
+    return deletedMessage
+};
+
 
 module.exports = Action;
