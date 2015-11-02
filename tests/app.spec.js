@@ -18,7 +18,7 @@ describe('Tokenz tests', function() {
     });
     describe('API tests', function() {
         describe('test test', function(){
-            it.only('test', function(done){
+            it.skip('test', function(done){
 
                 var storethis = {
                     "content": "cosa importante",
@@ -28,24 +28,24 @@ describe('Tokenz tests', function() {
 
                 var tokenz
 
-                var req = request(app)
+                request(app)
                     .post("/v1/tokens")
                     .send(storethis)
                     .end(function(err, res){
                         console.log("post token = "+res.body.token)
                         tokenz = res.body.token
 
-                        var req2 = request(app)
+                        request(app)
                             .get("/v1/tokens/"+tokenz)
                             .end(function(err, res){
                                 res.body.should.deepEqual(storethis);
 
-                                var req3 = request(app)
+                                request(app)
                                 .delete("/v1/tokens/delete/"+tokenz)
                                 .end(function(err, res){
                                     console.log("deleted res = "+res.text)
                                     try{
-                                        var req4 = request(app)
+                                        request(app)
                                             .get("/v1/tokens/"+tokenz)
                                             .end(function(err, res){
                                                 res.body.should.not.deepEqual(storethis);
@@ -57,7 +57,6 @@ describe('Tokenz tests', function() {
                                 })
                             });
                     })
-
             })
         })
 
@@ -180,7 +179,7 @@ describe('Tokenz tests', function() {
                 ret = action.create_new_token(storethis);
             });
 
-            it('queries the database correctly', function(done){
+            it.skip('queries the database correctly', function(done){
                 var mongoSpy = sinon.spy(action.getSchema() ,'findOne' );
 
                 action.get_data(ret.token, function() {
@@ -201,7 +200,7 @@ describe('Tokenz tests', function() {
                 });
             })
         })
-        describe('Delete data', function(){
+        describe.skip('Delete data', function(){
             var action, storethis, ret;
             before(function(done){
                 action = new Action(app);
