@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "description": "Super tokenz microservice",
   "main": "app.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --recursive"
   },
   "repository": {
     "type": "git",

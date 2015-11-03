@@ -4,6 +4,7 @@ var Action =  require('./action');
 var app = express();
 var util = require('util');
 var bodyParser = require('body-parser')
+var tokenParamsValidation = require('./tokens/api/parameterizers').create;
 
 app.use( logger("short") );
 
@@ -44,7 +45,7 @@ app.delete("/v1/tokens/delete/:token", function(req, res) {
 	console.log("Request: DELETE " + util.inspect(req.params.token, false, null));
     var response = app.action.delete_data(req.params.token, function(data){
     	res.type("string");
-    	res.status(200).send(response);    	
+    	res.status(200).send(response);
     });
 });
 

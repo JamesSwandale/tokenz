@@ -5,8 +5,9 @@
   - Validate input and return 422 if not processable
   - Serialization layer
   - Add type and createUser to model
+  - Support a 0 maxAge
+  - Add uuid of the created token in the request body
 - Show
-
   - Return 404 if not found
 - Delete
   - Return 404 if not found
