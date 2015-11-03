@@ -1,0 +1,12 @@
+- Index endpoint
+  - Serialization layer
+- Authentication
+- Create
+  - Validate input and return 422 if not processable
+  - Serialization layer
+  - Add type and createUser to model
+- Show
+
+  - Return 404 if not found
+- Delete
+  - Return 404 if not found
