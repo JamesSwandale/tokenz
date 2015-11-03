@@ -34,7 +34,6 @@ app.post("/v1/tokens", function(req, res) {
 app.get("/v1/tokens/:token", function(req, res) {
     console.log("Request GET: " + util.inspect(req.params.token, false, null));
     var response = app.action.get_data(req.params.token, function(data) {
-    	console.log(data)
         res.type("json");
         res.status(200).send(data);
 
@@ -42,11 +41,11 @@ app.get("/v1/tokens/:token", function(req, res) {
 });
 
 app.delete("/v1/tokens/delete/:token", function(req, res) {
-//    console.log("Request: " + req.body);
 	console.log("Request: DELETE " + util.inspect(req.params.token, false, null));
-    var response = app.action.delete_data(req.params.token);
+    var response = app.action.delete_data(req.params.token, function(data){
     	res.type("string");
-    	res.status(200).send(response);
+    	res.status(200).send(response);    	
+    });
 });
 
 

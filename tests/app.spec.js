@@ -17,49 +17,6 @@ describe('Tokenz tests', function() {
        // action.getSchema().base.connections[0].db.dropCollection(collName);
     });
     describe('API tests', function() {
-        describe('test test', function(){
-            it.skip('test', function(done){
-
-                var storethis = {
-                    "content": "cosa importante",
-                    "maxAge": 0,
-                    "type": "bicycle"
-                };
-
-                var tokenz
-
-                request(app)
-                    .post("/v1/tokens")
-                    .send(storethis)
-                    .end(function(err, res){
-                        console.log("post token = "+res.body.token)
-                        tokenz = res.body.token
-
-                        request(app)
-                            .get("/v1/tokens/"+tokenz)
-                            .end(function(err, res){
-                                res.body.should.deepEqual(storethis);
-
-                                request(app)
-                                .delete("/v1/tokens/delete/"+tokenz)
-                                .end(function(err, res){
-                                    console.log("deleted res = "+res.text)
-                                    try{
-                                        request(app)
-                                            .get("/v1/tokens/"+tokenz)
-                                            .end(function(err, res){
-                                                res.body.should.not.deepEqual(storethis);
-                                            });
-                                    }catch(e){
-                                        console.log("failed to get token")
-                                        done()
-                                    }
-                                })
-                            });
-                    })
-            })
-        })
-
         describe('When creating tokens POST', function() {
             it('will call the action class', function(done) {
                 var spy = sinon.spy(app.action, 'create_new_token');
@@ -179,7 +136,7 @@ describe('Tokenz tests', function() {
                 ret = action.create_new_token(storethis);
             });
 
-            it.skip('queries the database correctly', function(done){
+            it('queries the database correctly', function(done){
                 var mongoSpy = sinon.spy(action.getSchema() ,'findOne' );
 
                 action.get_data(ret.token, function() {
@@ -200,7 +157,8 @@ describe('Tokenz tests', function() {
                 });
             })
         })
-        describe.skip('Delete data', function(){
+
+        describe('Delete data', function(){
             var action, storethis, ret;
             before(function(done){
                 action = new Action(app);
@@ -213,10 +171,41 @@ describe('Tokenz tests', function() {
                 console.log("ret token ="+ret.token)
                 done()
             })
-            it('deletes the entry associated witht the token', function(done){
-                
-                action.delete_data(ret.token, function(res){
-                    res.should.deepEqual("Data deleted!")
+            it('deletes the entry associated with the token and returns the content', function(done){
+                var thing = action.delete_data(ret.token, function(res){
+                    res.should.deepEqual(storethis)
+                    done()
+                })
+            })
+        })
+    })
+
+    describe('Integration tests', function(){
+        it('Doing all the stuff works', function(done){
+
+            var storethis = {
+                "content": "cosa importante",
+                "maxAge": 0,
+                "type": "bicycle"
+            };
+
+            var tokenz
+
+            request(app).post("/v1/tokens").send(storethis).end(function(err, res){
+                tokenz = res.body.token
+
+                request(app).get("/v1/tokens/"+tokenz).end(function(err, res){
+                    console.log(res.body)
+                    res.body.should.deepEqual(storethis);
+
+                    request(app).delete("/v1/tokens/delete/"+tokenz).end(function(err, res){
+
+                        request(app).get("/v1/tokens/"+tokenz).end(function(err, res){
+                            var expectedErrorRes = {}
+                            res.body.should.deepEqual(expectedErrorRes);
+                            done();
+                        })
+                    })
                 })
             })
         })

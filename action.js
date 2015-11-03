@@ -51,29 +51,30 @@ Action.prototype.create_new_token = function(stuff) {
 Action.prototype.get_data = function(token, callback) {
     Data.findOne({"token":token})
         .exec( function(err, data) {
-            if (err) {
-                console.log(err);
-                //res.send(500);
+            if (err || data == null) {
+                console.log(err + " get errrroorrrrrr");
+                return callback({});
             } else {
                 callback(data.toObject().content);
             }
         });
 };
 
-Action.prototype.delete_data = function(token) {
+Action.prototype.delete_data = function(token, callback) {
 	var deletedMessage = "Data deleted!"
-	Data.findOneAndRemove({token:token})
-        .exec( function(err, data) {
-            if (err) {
-                console.log(err);
-                //res.send(500);
-            } else {
-    		Data.findOne({"token":token})
-            }
-        });
+	this.get_data(token, function(data){
+		Data.findOneAndRemove({token:token})
+	        .exec( function(err, data2) {
+	            if (err) {
+	                console.log(err + " delete errrroorrrrrr");
+	                //res.send(500);
+	            } else {
+	    		Data.findOne({"token":token})
+	            }
+	        });
+	    callback(data)
+	})
 
-    console.log(deletedMessage)
-    return deletedMessage
 };
 
 
