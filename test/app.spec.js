@@ -22,7 +22,7 @@ describe('Tokenz tests', function() {
                 var spy = sinon.spy(app.action, 'create_new_token');
 
                 var req = request(app)
-                    .post("/v1/tokens")
+                    .post("/v1/tokens.json")
                     .end(function(err, res) {
                         spy.called.should.equal(true);
                         spy.restore();
@@ -31,7 +31,7 @@ describe('Tokenz tests', function() {
             });
             it('Returns 201', function(done) {
                 request(app)
-                    .post("/v1/tokens")
+                    .post("/v1/tokens.json")
                     .end(function(err, res) {
                         res.statusCode.should.equal(201);
                         done();
@@ -45,7 +45,7 @@ describe('Tokenz tests', function() {
                 };
 
                 request(app)
-                    .post("/v1/tokens")
+                    .post("/v1/tokens.json")
                     .end(function(err, res) {
                         res.statusCode.should.equal(201);
                         res.body.should.have.property("token");
@@ -65,7 +65,7 @@ describe('Tokenz tests', function() {
                 };
 
                 request(app)
-                    .get("/v1/tokens/test-token")
+                    .get("/v1/tokens.json/test-token")
                     .end(function(err, res) {
                         res.statusCode.should.equal(200);
                         res.body.should.have.property("stored","nonsense");
@@ -85,7 +85,7 @@ describe('Tokenz tests', function() {
                     }
                 };
                 request(app)
-                    .get("/v1/tokens/delete/test-token")
+                    .get("/v1/tokens.json/delete/test-token")
                     .end(function(err, res) {
                         res.statusCode.should.equal(404);
                         app.action.delete_data = real_delete_data;
@@ -191,16 +191,16 @@ describe('Tokenz tests', function() {
 
             var tokenz
 
-            request(app).post("/v1/tokens").send(storethis).end(function(err, res){
+            request(app).post("/v1/tokens.json").send(storethis).end(function(err, res){
                 tokenz = res.body.token
 
-                request(app).get("/v1/tokens/"+tokenz).end(function(err, res){
+                request(app).get("/v1/tokens.json/"+tokenz).end(function(err, res){
                     console.log(res.body)
                     res.body.should.deepEqual(storethis);
 
-                    request(app).delete("/v1/tokens/delete/"+tokenz).end(function(err, res){
+                    request(app).delete("/v1/tokens.json/"+tokenz).end(function(err, res){
 
-                        request(app).get("/v1/tokens/"+tokenz).end(function(err, res){
+                        request(app).get("/v1/tokens.json/"+tokenz).end(function(err, res){
                             var expectedErrorRes = {}
                             res.body.should.deepEqual(expectedErrorRes);
                             done();
