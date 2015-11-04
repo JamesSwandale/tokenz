@@ -22,7 +22,7 @@ describe('Tokenz tests', function() {
                 var spy = sinon.spy(app.action, 'create_new_token');
 
                 var req = request(app)
-                    .post("/v1/tokens")
+                    .post("/v1/tokens.json")
                     .end(function(err, res) {
                         spy.called.should.equal(true);
                         spy.restore();
@@ -31,7 +31,7 @@ describe('Tokenz tests', function() {
             });
             it('Returns 201', function(done) {
                 request(app)
-                    .post("/v1/tokens")
+                    .post("/v1/tokens.json")
                     .end(function(err, res) {
                         res.statusCode.should.equal(201);
                         done();
@@ -45,7 +45,7 @@ describe('Tokenz tests', function() {
                 };
 
                 request(app)
-                    .post("/v1/tokens")
+                    .post("/v1/tokens.json")
                     .end(function(err, res) {
                         res.statusCode.should.equal(201);
                         res.body.should.have.property("token");
@@ -65,7 +65,7 @@ describe('Tokenz tests', function() {
                 };
 
                 request(app)
-                    .get("/v1/tokens/test-token")
+                    .get("/v1/tokens.json/test-token")
                     .end(function(err, res) {
                         res.statusCode.should.equal(200);
                         res.body.should.have.property("stored","nonsense");
@@ -76,6 +76,27 @@ describe('Tokenz tests', function() {
             //it('', function(done) {
             //});
         })
+        describe('When requesting all user entries', function(){
+            it('Returns all data for that user', function(done){
+                var real_get_all_data = app.action.get_all_data;
+                app.action.get_all_data = function(sessionid, callback) {
+                    if(sessionid === 'test-session') {
+                       callback([{stored:'nonsense'},{stored:'nonsense2'}]);
+                    }
+                };
+
+                request(app)
+                    .get("/v1/tokens.json?sessionId=test-session")
+                    .end(function(err, res) {
+                        res.statusCode.should.equal(200);
+                        res.body.should.be.instanceof(Array)
+                        res.body[0].should.have.property("stored","nonsense");
+                        res.body[1].should.have.property("stored","nonsense2");
+                        app.action.get_all_data = real_get_all_data;
+                        done();
+                    });
+            });
+        })
         describe('When deleting tokens', function() {
             it('Data will be removed', function(done) {
                 var real_delete_data = app.action.delete_data;
@@ -85,7 +106,7 @@ describe('Tokenz tests', function() {
                     }
                 };
                 request(app)
-                    .get("/v1/tokens/delete/test-token")
+                    .get("/v1/tokens.json/delete/test-token")
                     .end(function(err, res) {
                         res.statusCode.should.equal(404);
                         app.action.delete_data = real_delete_data;
@@ -93,21 +114,7 @@ describe('Tokenz tests', function() {
                     });
             });
         })
-
-/*
-                describe.skip('When accessing the api endpoints', function() {
-                    it('', function(done) {
-                    });
-                    it('', function(done) {
-                    });
-                })
-                */
     })
-
-
-
-
-
 
     describe('Action tests', function() {
         describe('Create new token', function() {
@@ -152,7 +159,7 @@ describe('Tokenz tests', function() {
 
             it('calls back with the first token found', function(done){
                 action.get_data(ret.token, function(foundtoken) {
-                    foundtoken.should.deepEqual(storethis);
+                    foundtoken.content.should.deepEqual(storethis);
                     done();
                 });
             })
@@ -168,12 +175,11 @@ describe('Tokenz tests', function() {
                     "type": "name"
                 };
                 ret = action.create_new_token(storethis)
-                console.log("ret token ="+ret.token)
                 done()
             })
             it('deletes the entry associated with the token and returns the content', function(done){
                 var thing = action.delete_data(ret.token, function(res){
-                    res.should.deepEqual(storethis)
+                    res.content.should.deepEqual(storethis)
                     done()
                 })
             })
@@ -181,30 +187,51 @@ describe('Tokenz tests', function() {
     })
 
     describe('Integration tests', function(){
-        it('Doing all the stuff works', function(done){
+        describe('When creating, then deleting a token', function(){
+            it('the token is deleted correctly', function(done){
 
-            var storethis = {
-                "content": "cosa importante",
-                "maxAge": 0,
-                "type": "bicycle"
-            };
+                var storethis = {
+                    "content": "cosa importante",
+                    "maxAge": 0,
+                    "type": "bicycle"
+                };
 
-            var tokenz
+                var tokenz
 
-            request(app).post("/v1/tokens").send(storethis).end(function(err, res){
-                tokenz = res.body.token
+                request(app).post("/v1/tokens.json").send(storethis).end(function(err, res){
+                    tokenz = res.body.token
 
-                request(app).get("/v1/tokens/"+tokenz).end(function(err, res){
-                    console.log(res.body)
-                    res.body.should.deepEqual(storethis);
+                    request(app).get("/v1/tokens.json/"+tokenz).end(function(err, res){
+                        res.body.content.should.deepEqual(storethis);
 
-                    request(app).delete("/v1/tokens/delete/"+tokenz).end(function(err, res){
+                        request(app).delete("/v1/tokens.json/"+tokenz).end(function(err, res){
 
-                        request(app).get("/v1/tokens/"+tokenz).end(function(err, res){
-                            var expectedErrorRes = {}
-                            res.body.should.deepEqual(expectedErrorRes);
-                            done();
+                            request(app).get("/v1/tokens.json/"+tokenz).end(function(err, res){
+                                var expectedErrorRes = {}
+                                res.body.should.deepEqual(expectedErrorRes);
+                                done();
+                            })
                         })
+                    })
+                })
+            })
+        })
+        describe('When performing a get with a sessionId', function(){
+            it('all associated user data is returned', function(done){
+                var storethis = {
+                    "content": "get all",
+                    "maxAge": 0,
+                    "type": "bicycle"
+                };
+
+                var tokenz
+
+                request(app).post("/v1/tokens.json").send(storethis).end(function(err, res){
+                    tokenz = res.body.token
+
+                    request(app).get("/v1/tokens.json?sessionId=123456").end(function(err, res){
+                        res.body.should.be.instanceof(Array)
+                        done()
                     })
                 })
             })

@@ -1,4 +1,6 @@
 var Data = require('./dataschema');
+var util = require('util');
+
 
 // Token
 var token = function() {
@@ -24,19 +26,20 @@ Action.prototype.getSchema = function() {
 };
 
 Action.prototype.create_new_token = function(stuff) {
-
      var newData = new Data({
         token: token(),
         content: stuff,
         expired_at: new Date(),
-        created_at: new Date()
+        created_at: new Date(),
+        userSession: "123456",
+        type: "nonsense"
     });
 
-    console.log("New data with token: " + newData.token);
+    util.log("New data with token: " + newData.token);
 
     newData.save(function(err, res){
         if (err) {
-            console.log(err);
+            util.log(err);
 //            res.sendStatus(500);
         } else {
             //exports.sendPushNotification(newData,'Create', req);
@@ -52,21 +55,32 @@ Action.prototype.get_data = function(token, callback) {
     Data.findOne({"token":token})
         .exec( function(err, data) {
             if (err || data == null) {
-                console.log(err + " get errrroorrrrrr");
+                util.log(err + " get errrroorrrrrr");
                 return callback({});
             } else {
-                callback(data.toObject().content);
+                callback(data.toObject());
             }
         });
 };
 
+Action.prototype.get_all_data = function(sessionId, callback) {
+    Data.find({"userSession":sessionId})
+        .exec( function(err, data) {
+            if (err || data == null) {
+                util.log(err + " get all errrroorrrrrr");
+                return callback([{}]);
+            } else {
+                callback(data);
+            }
+        });
+};
 Action.prototype.delete_data = function(token, callback) {
 	var deletedMessage = "Data deleted!"
 	this.get_data(token, function(data){
 		Data.findOneAndRemove({token:token})
 	        .exec( function(err, data2) {
 	            if (err) {
-	                console.log(err + " delete errrroorrrrrr");
+	                util.log(err + " delete errrroorrrrrr");
 	                //res.send(500);
 	            } else {
 	    		Data.findOne({"token":token})

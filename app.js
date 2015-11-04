@@ -6,34 +6,35 @@ var util = require('util');
 var bodyParser = require('body-parser')
 var tokenParamsValidation = require('./tokens/api/parameterizers').create;
 
-app.use( logger("short") );
+//app.use(logger("dev"));
+
+util.log = function() {}
 
 
 app.listen(3000, function() {
-    console.log("App started on port 3000");
+    util.log("App started on port 3000");
 });
 
 app.action = new Action(app);
 app.use(bodyParser.json())
 
-
-//{
-//    create_new_token: function(stuff) {
-//        console.log(stuff);
-//    }
-//}
-
-
-
-app.post("/v1/tokens", function(req, res) {
-	console.log("Request: POST " + util.inspect(req.body, false, null));
+app.post("/v1/tokens.json", function(req, res) {
+	util.log("Request: POST " + util.inspect(req.body, false, null));
     var response = app.action.create_new_token(req.body)
 	    res.type("json");
 	    res.status(201).send(response);
 });
 
-app.get("/v1/tokens/:token", function(req, res) {
-    console.log("Request GET: " + util.inspect(req.params.token, false, null));
+app.get("/v1/tokens.json", function(req, res) {
+    util.log("Request GET ALL : " + util.inspect(req.query.sessionId, false, null));
+    var response = app.action.get_all_data(req.query.sessionId, function(data) {
+        res.type("json");
+        res.status(200).send(data);
+    });
+});
+
+app.get("/v1/tokens.json/:token", function(req, res) {
+    util.log("Request GET: " + util.inspect(req.params.token, false, null));
     var response = app.action.get_data(req.params.token, function(data) {
         res.type("json");
         res.status(200).send(data);
@@ -41,8 +42,8 @@ app.get("/v1/tokens/:token", function(req, res) {
     });
 });
 
-app.delete("/v1/tokens/delete/:token", function(req, res) {
-	console.log("Request: DELETE " + util.inspect(req.params.token, false, null));
+app.delete("/v1/tokens.json/:token", function(req, res) {
+	util.log("Request: DELETE " + util.inspect(req.params.token, false, null));
     var response = app.action.delete_data(req.params.token, function(data){
     	res.type("string");
     	res.status(200).send(response);
