@@ -29,6 +29,18 @@ var DataSchema = new Schema({
         unique:false,
         required:true
     },
+    type: {
+        type:String,
+        trim: true,
+        unique:false,
+        required:true
+    },
+    userSession: {
+        type:String,
+        trim: true,
+        unique:false,
+        required:true
+    },
     expired_at: Date,
     created_at: Date
 });
