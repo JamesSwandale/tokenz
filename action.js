@@ -1,20 +1,6 @@
 var Data = require('./dataschema');
 var util = require('util');
-
-
-// Token
-var token = function() {
-    var finalToken = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/x/g, function()
-        {
-            return (Math.random()*16|0).toString(16)
-        }).replace(/y/, function(){
-            var hex = ['8', '9', 'a', 'b'];
-            return hex[(Math.random() * (hex.length - 0) + 0|0)]
-        })
-    return finalToken
-    };
-
-
+var uuid = require('node-uuid');
 
 // Action
 var Action = function(app) {
@@ -27,7 +13,7 @@ Action.prototype.getSchema = function() {
 
 Action.prototype.create_new_token = function(stuff) {
      var newData = new Data({
-        token: token(),
+        token: uuid.v4(),
         content: stuff,
         expired_at: new Date(),
         created_at: new Date(),
