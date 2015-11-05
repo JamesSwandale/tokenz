@@ -7,7 +7,8 @@ var chai = require('chai'),
     app = require('../app'),
     Action = require('../action'),
     DataSchema = require('../dataschema'),
-    util = require('util');
+    util = require('util'),
+    validator = require('validator');
 
 
 describe('Tokenz tests', function() {
@@ -129,7 +130,27 @@ describe('Tokenz tests', function() {
                 ret.should.have.property('stuff', storethis);
                 ret.should.have.property('token');
             });
+
+            it('has a valid v4 format uuid', function() {
+                var action = new Action(app);
+                var storethis = {
+                    "content": "cosa importante",
+                    "maxAge": 0,
+                    "type": "bicycle"
+                };
+
+                var ret = action.create_new_token(storethis);
+
+                ret.should.have.property('token');
+
+                ret.token.should.be.a.string
+                validator.isUUID(ret.token, 4).should.be.equal(true);
+
+            });
         })
+
+
+
 
         describe('Get data', function(){
             var action,storethis,ret;
