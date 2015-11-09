@@ -20,7 +20,7 @@ describe('Tokenz tests', function() {
     describe('API tests', function() {
         describe('When creating tokens POST', function() {
             it('will call the action class', function(done) {
-                var spy = sinon.spy(app.action, 'create_new_token');
+                var spy = sinon.spy(app.action, 'createNewToken');
 
                 var req = request(app)
                     .post("/v1/tokens.json")
@@ -40,8 +40,8 @@ describe('Tokenz tests', function() {
             });
             it('Returns the value returned by the action layer', function(done) {
 
-                var real_create_new_token = app.action.create_new_token;
-                app.action.create_new_token = function(stuff) {
+                var real_createNewToken = app.action.createNewToken;
+                app.action.createNewToken = function(stuff) {
                     return {token:'nonsense'};
                 };
 
@@ -50,7 +50,7 @@ describe('Tokenz tests', function() {
                     .end(function(err, res) {
                         res.statusCode.should.equal(201);
                         res.body.should.have.property("token");
-                        app.action.create_new_token = real_create_new_token;
+                        app.action.createNewToken = real_createNewToken;
                         done();
                     });
             });
@@ -58,8 +58,8 @@ describe('Tokenz tests', function() {
 
         describe('When reading tokens', function() {
             it('Returns the value returned by the action layer', function(done) {
-                var real_get_data = app.action.get_data;
-                app.action.get_data = function(token, callback) {
+                var real_getData = app.action.getData;
+                app.action.getData = function(token, callback) {
                     if(token === 'test-token') {
                        callback({stored:'nonsense'});
                     }
@@ -70,7 +70,7 @@ describe('Tokenz tests', function() {
                     .end(function(err, res) {
                         res.statusCode.should.equal(200);
                         res.body.should.have.property("stored","nonsense");
-                        app.action.get_data = real_get_data;
+                        app.action.getData = real_getData;
                         done();
                     });
             });
@@ -79,8 +79,8 @@ describe('Tokenz tests', function() {
         })
         describe('When requesting all user entries', function(){
             it('Returns all data for that user', function(done){
-                var real_get_all_data = app.action.get_all_data;
-                app.action.get_all_data = function(sessionid, callback) {
+                var real_getAllData = app.action.getAllData;
+                app.action.getAllData = function(sessionid, callback) {
                     if(sessionid === 'test-session') {
                        callback([{stored:'nonsense'},{stored:'nonsense2'}]);
                     }
@@ -93,15 +93,15 @@ describe('Tokenz tests', function() {
                         res.body.should.be.instanceof(Array)
                         res.body[0].should.have.property("stored","nonsense");
                         res.body[1].should.have.property("stored","nonsense2");
-                        app.action.get_all_data = real_get_all_data;
+                        app.action.getAllData = real_getAllData;
                         done();
                     });
             });
         })
         describe('When deleting tokens', function() {
             it('Data will be removed', function(done) {
-                var real_delete_data = app.action.delete_data;
-                app.action.delete_data = function(token, callback) {
+                var real_deleteData = app.action.deleteData;
+                app.action.deleteData = function(token, callback) {
                     if(token === 'test-token') {
                        callback("Data removed!");
                     }
@@ -110,7 +110,7 @@ describe('Tokenz tests', function() {
                     .get("/v1/tokens.json/delete/test-token")
                     .end(function(err, res) {
                         res.statusCode.should.equal(404);
-                        app.action.delete_data = real_delete_data;
+                        app.action.deleteData = real_deleteData;
                         done();
                     });
             });
@@ -126,7 +126,7 @@ describe('Tokenz tests', function() {
                     "maxAge": 0,
                     "type": "bicycle"
                 };
-                var ret = action.create_new_token(storethis);
+                var ret = action.createNewToken(storethis);
                 ret.should.have.property('stuff', storethis);
                 ret.should.have.property('token');
             });
@@ -139,7 +139,7 @@ describe('Tokenz tests', function() {
                     "type": "bicycle"
                 };
 
-                var ret = action.create_new_token(storethis);
+                var ret = action.createNewToken(storethis);
 
                 ret.should.have.property('token');
 
@@ -161,13 +161,13 @@ describe('Tokenz tests', function() {
                     "maxAge": 0,
                     "type": "bicycle"
                 };
-                ret = action.create_new_token(storethis);
+                ret = action.createNewToken(storethis);
             });
 
             it('queries the database correctly', function(done){
                 var mongoSpy = sinon.spy(action.getSchema() ,'findOne' );
 
-                action.get_data(ret.token, function() {
+                action.getData(ret.token, function() {
                     mongoSpy.called.should.equal(true);
                     mongoSpy.calledWith({token:ret.token}).should.equal(true);
 
@@ -179,7 +179,7 @@ describe('Tokenz tests', function() {
             })
 
             it('calls back with the first token found', function(done){
-                action.get_data(ret.token, function(foundtoken) {
+                action.getData(ret.token, function(foundtoken) {
                     foundtoken.content.should.deepEqual(storethis);
                     done();
                 });
@@ -195,11 +195,11 @@ describe('Tokenz tests', function() {
                     "maxAge": 0,
                     "type": "name"
                 };
-                ret = action.create_new_token(storethis)
+                ret = action.createNewToken(storethis)
                 done()
             })
             it('deletes the entry associated with the token and returns the content', function(done){
-                var thing = action.delete_data(ret.token, function(res){
+                var thing = action.deleteData(ret.token, function(res){
                     res.content.should.deepEqual(storethis)
                     done()
                 })

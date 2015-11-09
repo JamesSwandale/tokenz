@@ -11,7 +11,7 @@ Action.prototype.getSchema = function() {
     return Data;
 };
 
-Action.prototype.create_new_token = function(stuff) {
+Action.prototype.createNewToken = function(stuff) {
      var newData = new Data({
         token: uuid.v4(),
         content: stuff,
@@ -37,7 +37,7 @@ Action.prototype.create_new_token = function(stuff) {
             stuff:stuff  };
 };
 
-Action.prototype.get_data = function(token, callback) {
+Action.prototype.getData = function(token, callback) {
     Data.findOne({"token":token})
         .exec( function(err, data) {
             if (err || data == null) {
@@ -49,7 +49,7 @@ Action.prototype.get_data = function(token, callback) {
         });
 };
 
-Action.prototype.get_all_data = function(sessionId, callback) {
+Action.prototype.getAllData = function(sessionId, callback) {
     Data.find({"userSession":sessionId})
         .exec( function(err, data) {
             if (err || data == null) {
@@ -60,9 +60,9 @@ Action.prototype.get_all_data = function(sessionId, callback) {
             }
         });
 };
-Action.prototype.delete_data = function(token, callback) {
+Action.prototype.deleteData = function(token, callback) {
 	var deletedMessage = "Data deleted!"
-	this.get_data(token, function(data){
+	this.getData(token, function(data){
 		Data.findOneAndRemove({token:token})
 	        .exec( function(err, data2) {
 	            if (err) {
